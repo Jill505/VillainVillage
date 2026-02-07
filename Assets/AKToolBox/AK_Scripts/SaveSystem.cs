@@ -75,6 +75,7 @@ public class SaveFile
     public float SFXVolume = 1f;
 
     //Game Process
+    public PlayerData playerData;
 
     //Player GamePlay Setting
 
