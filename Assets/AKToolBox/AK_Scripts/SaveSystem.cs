@@ -58,9 +58,18 @@ public class SaveSystem : MonoBehaviour
         string fullPath = Application.persistentDataPath + saveFilePath;
 
         SaveFile sSF = new SaveFile();
+
+        InitSF(ref sSF);
+        //DO init here
+
         File.WriteAllText(fullPath, JsonUtility.ToJson(sSF));
 
         SF = sSF;
+    }
+
+    static public void InitSF(ref SaveFile SF)
+    {
+        SF.playerData.playerUnlockCharacterPool[0] = true;
     }
 }
 
@@ -75,7 +84,7 @@ public class SaveFile
     public float SFXVolume = 1f;
 
     //Game Process
-    public PlayerData playerData;
+    public PlayerData playerData = new PlayerData();
 
     //Player GamePlay Setting
 

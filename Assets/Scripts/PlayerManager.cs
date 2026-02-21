@@ -1,30 +1,36 @@
 using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine.Experimental.GlobalIllumination;
 
 public class PlayerManager : MonoBehaviour
 {
     public GameManager gameManager;
 
-    public void CreateCaracter()
+    public SO_Character[] SystemCharacterPool;
+    public bool[] playerUnlockCharacterPool;
+
+    public void CreateCaracter(SO_Character SOC)
     {
-        SaveSystem.SF.playerData.spawnCharacter();
+        SaveSystem.SF.playerData.createCharacter(SOC);
     }
 
-    public void RemoveCharacter(int index)
+    public void RetireCurrentCharacter()
     {
-        SaveSystem.SF.playerData.removeCharacter(index);
+        SaveSystem.SF.playerData.currentCharacter.isCharacterRetire = true; 
+        //Add Skill Point to player account;
+        SaveSystem.SF.playerData.StatsPointIndex += (SaveSystem.SF.playerData.currentCharacter.level / 5);
+        //SaveSystem.SF.playerData.currentCharacter = null;
     }
-
 }
 
-[SerializeField]
+[System.Serializable]
 public class PlayerData
 {
-    public string nickName;
-    public string title;
+    public string AccountTitle = "無名的";
+    public string AccountNickName = "Tav" ;
+    public string AccountAvatarID = "";
 
     public int ReincarnationCount;
+    public int StatsPointIndex;
 
     public int HistoryKill;
     public int HistoryPassiveKill;
@@ -35,25 +41,26 @@ public class PlayerData
     public int HistoryWin_ToMob;
     public int HistoryWin_ToBoss;
 
-    public List<CharacterData> myCharacters = new List<CharacterData>();
+    public CharacterData currentCharacter = new CharacterData();
+    public List<CharacterData> historyCharacters = new List<CharacterData>();
 
-    public void spawnCharacter()
+    public bool[] playerUnlockCharacterPool = new bool[512];
+
+    public void createCharacter(SO_Character soC)
     {
         CharacterData spawnCharData = new CharacterData();
 
-        myCharacters.Add(spawnCharData);
+        //init
+        spawnCharData.CharacterName = soC.characterData.CharacterName;
+
+        historyCharacters.Add(spawnCharData);
     }
 
-    public void removeCharacter(int index)
-    {
-        myCharacters.RemoveAt(index);
-    }
-
-    public bool SetNickName(string p_Name)
+    public bool SetAccountNickName(string p_Name)
     {
         if (p_Name.Length < 20 )
         {
-            nickName = p_Name;
+            AccountNickName = p_Name;
             return true;
         }
         else
@@ -62,15 +69,48 @@ public class PlayerData
         }
     }
 
-    public void SetTitle(string p_Title)
+    public void SetAccountTitle(string p_Title)
     {
-        title = p_Title;    
+        AccountTitle = p_Title;    
     }
 }
 
 
 [System.Serializable]
 public class CharacterData
+{
+    public string CharacterTitle;
+    public string CharacterName;
+    public string CharacterAvatarID;
+    public string CharacterShortDesc;
+    public string CharacterLongDesc;
+
+    public List<string> CharacterStory;
+
+    public int level;
+    public long exp;
+
+    public int MAX_HP;
+    public int currentHP;
+    public int ATK;
+    
+    public int DEF;
+
+    public int STR; //力
+    public int END; //體
+    public int INT; //智
+    public int AGI; //敏
+    public int SPR; //精
+
+    //Set up data
+    public int usedStatsPointIndex;
+
+    public bool isCharacterDie = false;
+    public bool isCharacterRetire = false;
+}
+
+[System.Serializable]
+public class BattleCharacterData
 {
     public string CharacterName;
     public string CharacterAvatarID;
@@ -79,8 +119,9 @@ public class CharacterData
     public long exp;
 
     public int MAX_HP;
+    public int currentHP;
     public int ATK;
-    
+
     public int DEF;
 
     public int STR;
@@ -89,5 +130,7 @@ public class CharacterData
     public int AGI;
     public int SPR;
 
-    public int inFight_SpeedBarPos;
+    //public in battle data
+    public int roundUsed;
+    public int violentEnergy;
 }
